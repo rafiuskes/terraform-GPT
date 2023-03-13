@@ -118,4 +118,9 @@ resource "google_billing_budget" "budget" {
   threshold_rules {
     threshold_percent = each.value.threshold_rules.threshold_percent
     spend_basis        = each.value.threshold_rules.spend_basis
-    email_recipients
+    email_recipients = [
+      "<USER_EMAIL>",
+      "<GROUP_EMAIL>",
+    ]
+  }
+}
