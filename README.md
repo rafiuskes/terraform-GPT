@@ -33,4 +33,17 @@ Run `scripts/agent.py` to be guided through entering the required variables. The
 script can also generate a basic GitHub Actions workflow for running Terraform
 commands automatically.
 
+### Fetching GCP information
+
+The workflow `.github/workflows/gcp-info.yml` can query your Google Cloud
+environment for available projects and billing accounts. It uses the helper
+script `scripts/fetch_gcp_info.sh` which relies on the Google Cloud SDK.
+
+1. Add `GCP_PROJECT_ID` and `GCP_SA_KEY` secrets to your repository. The latter
+   should contain the JSON key for a service account with permission to list
+   projects and billing accounts.
+2. Trigger the **Fetch GCP Info** workflow from the GitHub Actions tab.
+3. After the job completes, download the `gcp-info` artifact to review the
+   generated `gcp-info.json` file.
+
 This structure follows the [Cloud Foundation Fabric](https://github.com/GoogleCloudPlatform/cloud-foundation-fabric) style by separating version constraints, backend configuration and variable definitions.
