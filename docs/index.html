@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Terraform Config Generator</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2rem; }
+    label { display: block; margin-top: 1rem; }
+    input { width: 300px; }
+    pre { background: #f0f0f0; padding: 1rem; }
+  </style>
+</head>
+<body>
+  <h1>Terraform Configuration Helper</h1>
+  <p>Fill in the values below and click <strong>Generate JSON</strong> to get a <code>terraform.auto.tfvars.json</code> snippet.</p>
+  <form id="tf-form" onsubmit="return false;">
+    <label>Credentials file
+      <input type="text" id="credentials_file" placeholder="/path/to/key.json" required>
+    </label>
+    <label>Project ID
+      <input type="text" id="project_id" required>
+    </label>
+    <label>Region
+      <input type="text" id="region" placeholder="us-central1" required>
+    </label>
+    <label>Backend bucket
+      <input type="text" id="backend_bucket" required>
+    </label>
+    <label>User email
+      <input type="email" id="user_email" required>
+    </label>
+    <label>Group email
+      <input type="email" id="group_email" required>
+    </label>
+    <label>Billing account ID
+      <input type="text" id="billing_account_id" placeholder="XXXXXX-XXXXXX-XXXXXX" required>
+    </label>
+    <label>Budget currency code
+      <input type="text" id="budget_amount_currency_code" value="USD">
+    </label>
+    <label>Budget amount
+      <input type="number" id="budget_amount_units" value="100">
+    </label>
+    <label>Alert threshold percent
+      <input type="number" id="budget_threshold_percent" value="50">
+    </label>
+    <button type="button" onclick="generate()">Generate JSON</button>
+  </form>
+  <h2>terraform.auto.tfvars.json</h2>
+  <pre id="output"></pre>
+  <script>
+    function generate() {
+      const keys = [
+        'credentials_file',
+        'project_id',
+        'region',
+        'backend_bucket',
+        'user_email',
+        'group_email',
+        'billing_account_id',
+        'budget_amount_currency_code',
+        'budget_amount_units',
+        'budget_threshold_percent'
+      ];
+      const data = {};
+      keys.forEach(k => {
+        data[k] = document.getElementById(k).value.trim();
+      });
+      document.getElementById('output').textContent = JSON.stringify(data, null, 2);
+    }
+  </script>
+</body>
+</html>

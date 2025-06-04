@@ -33,6 +33,17 @@ Run `scripts/agent.py` to be guided through entering the required variables. The
 script can also generate a basic GitHub Actions workflow for running Terraform
 commands automatically.
 
+### Web form
+
+An alternative to the command line helper is the simple web form hosted with
+[GitHub Pages](https://rafiuskes.github.io/tfplan/). Open the page, enter the
+required values and click **Generate JSON** to obtain a `terraform.auto.tfvars.json`
+snippet.
+
+Save the generated JSON into a file named `terraform.auto.tfvars.json` in the
+repository root. Terraform will automatically load these variables on the next
+`terraform plan` or `terraform apply` run.
+
 ### Fetching GCP information
 
 The workflow `.github/workflows/gcp-info.yml` can query your Google Cloud
