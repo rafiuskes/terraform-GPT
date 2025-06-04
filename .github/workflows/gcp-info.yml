@@ -1,0 +1,26 @@
+name: Fetch GCP Info
+on:
+  workflow_dispatch:
+
+jobs:
+  gather:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Run query script
+        run: ./scripts/fetch_gcp_info.sh
+
+      - name: Upload info
+        uses: actions/upload-artifact@v3
+        with:
+          name: gcp-info
+          path: gcp-info.json
+
