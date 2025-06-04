@@ -8,6 +8,11 @@ variable "region" {
   description = "The region in which to deploy resources, e.g. 'us-central1'."
 }
 
+variable "credentials_file" {
+  type        = string
+  description = "Path to the service account JSON key used by Terraform to authenticate with Google Cloud."
+}
+
 variable "backend_bucket" {
   type    = string
   description = "The name of the Google Cloud Storage bucket to use for the Terraform backend."
