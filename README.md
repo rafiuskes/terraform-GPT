@@ -36,9 +36,12 @@ commands automatically.
 ### Web form
 
 An alternative to the command line helper is the simple web form hosted with
-[GitHub Pages](https://rafiuskes.github.io/tfplan/). Open the page, enter the
+[GitHub Pages](https://rafiuskes.github.io/terraform-GPT/). Open the page, enter the
 required values and click **Generate JSON** to obtain a `terraform.auto.tfvars.json`
 snippet.
+The page features a minimalistic design and a floating **Cloud Architect** chat bubble.
+Type a question to receive built‑in tips or provide your OpenAI API key for full
+ChatGPT responses.
 
 Save the generated JSON into a file named `terraform.auto.tfvars.json` in the
 repository root. Terraform will automatically load these variables on the next

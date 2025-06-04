@@ -2,72 +2,275 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Terraform Config Generator</title>
+  <title>Terraform Config Helper</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 2rem; }
-    label { display: block; margin-top: 1rem; }
-    input { width: 300px; }
-    pre { background: #f0f0f0; padding: 1rem; }
+    body {
+      font-family: "Segoe UI", Tahoma, sans-serif;
+      max-width: 800px;
+      margin: 2rem auto;
+      line-height: 1.5;
+      color: #333;
+    }
+    form {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+    label {
+      display: block;
+    }
+    input[type=text], input[type=email], input[type=number], textarea {
+      width: 100%;
+      padding: 0.4rem;
+      box-sizing: border-box;
+    }
+    button {
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+    }
+    pre {
+      background: #f0f0f0;
+      padding: 1rem;
+      overflow-x: auto;
+    }
+    .field {
+      position: relative;
+    }
+    .help {
+      position: absolute;
+      right: 0;
+      top: 0;
+      cursor: pointer;
+      color: #0366d6;
+    }
+    .tooltip {
+      display: none;
+      position: absolute;
+      top: 1.5rem;
+      right: 0;
+      background: #fff;
+      border: 1px solid #ccc;
+      padding: 0.5rem;
+      width: 250px;
+      z-index: 10;
+    }
+    .help:hover + .tooltip {
+      display: block;
+    }
+    #chatbot {
+      position: fixed;
+      bottom: 1rem;
+      right: 1rem;
+      max-width: 300px;
+      font-size: 14px;
+    }
+
+    #chat-toggle {
+      background: #0366d6;
+      color: #fff;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    #chat-window {
+      display: none;
+      background: #fff;
+      border: 1px solid #ccc;
+      padding: 0.5rem;
+      margin-top: 0.5rem;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    #chat-window.open {
+      display: block;
+    }
+
+    #chat-messages {
+      max-height: 150px;
+      overflow-y: auto;
+      margin-bottom: 0.5rem;
+      white-space: pre-wrap;
+    }
   </style>
 </head>
 <body>
   <h1>Terraform Configuration Helper</h1>
-  <p>Fill in the values below and click <strong>Generate JSON</strong> to get a <code>terraform.auto.tfvars.json</code> snippet.</p>
+  <p>Fill in the values below and click <strong>Generate JSON</strong> to obtain a <code>terraform.auto.tfvars.json</code> snippet.</p>
+
   <form id="tf-form" onsubmit="return false;">
-    <label>Credentials file
-      <input type="text" id="credentials_file" placeholder="/path/to/key.json" required>
-    </label>
-    <label>Project ID
-      <input type="text" id="project_id" required>
-    </label>
-    <label>Region
-      <input type="text" id="region" placeholder="us-central1" required>
-    </label>
-    <label>Backend bucket
-      <input type="text" id="backend_bucket" required>
-    </label>
-    <label>User email
-      <input type="email" id="user_email" required>
-    </label>
-    <label>Group email
-      <input type="email" id="group_email" required>
-    </label>
-    <label>Billing account ID
-      <input type="text" id="billing_account_id" placeholder="XXXXXX-XXXXXX-XXXXXX" required>
-    </label>
-    <label>Budget currency code
-      <input type="text" id="budget_amount_currency_code" value="USD">
-    </label>
-    <label>Budget amount
-      <input type="number" id="budget_amount_units" value="100">
-    </label>
-    <label>Alert threshold percent
-      <input type="number" id="budget_threshold_percent" value="50">
-    </label>
+    <div class="field">
+      <label>Credentials file
+        <input type="text" id="credentials_file" placeholder="/path/to/key.json" pattern="[\\w./-]+\\.json" required title="Path to service account JSON">
+        <span class="help" data-field="credentials_file">?</span>
+        <span class="tooltip"></span>
+      </label>
+    </div>
+    <div class="field">
+      <label>Project ID
+        <input type="text" id="project_id" pattern="[a-z][a-z0-9-]{4,28}[a-z0-9]" required title="e.g. my-project-123">
+        <span class="help" data-field="project_id">?</span>
+        <span class="tooltip"></span>
+      </label>
+    </div>
+    <div class="field">
+      <label>Region
+        <input type="text" id="region" placeholder="us-central1" pattern="[a-z]+-[a-z0-9]+[0-9]" required title="GCP region like us-central1">
+        <span class="help" data-field="region">?</span>
+        <span class="tooltip"></span>
+      </label>
+    </div>
+    <div class="field">
+      <label>Backend bucket
+        <input type="text" id="backend_bucket" pattern="[a-z0-9.-]+" required title="Existing GCS bucket name">
+        <span class="help" data-field="backend_bucket">?</span>
+        <span class="tooltip"></span>
+      </label>
+    </div>
+    <div class="field">
+      <label>User email
+        <input type="email" id="user_email" required title="you@example.com">
+        <span class="help" data-field="user_email">?</span>
+        <span class="tooltip"></span>
+      </label>
+    </div>
+    <div class="field">
+      <label>Group email
+        <input type="email" id="group_email" required title="group@example.com">
+        <span class="help" data-field="group_email">?</span>
+        <span class="tooltip"></span>
+      </label>
+    </div>
+    <div class="field">
+      <label>Billing account ID
+        <input type="text" id="billing_account_id" placeholder="XXXXXX-XXXXXX-XXXXXX" pattern="[0-9]{6}-[0-9]{6}-[0-9]{6}" required title="123456-123456-123456">
+        <span class="help" data-field="billing_account_id">?</span>
+        <span class="tooltip"></span>
+      </label>
+    </div>
+    <div class="field">
+      <label>Budget currency code
+        <input type="text" id="budget_amount_currency_code" value="USD" pattern="[A-Z]{3}" required title="3-letter code e.g. USD">
+        <span class="help" data-field="budget_amount_currency_code">?</span>
+        <span class="tooltip"></span>
+      </label>
+    </div>
+    <div class="field">
+      <label>Budget amount
+        <input type="number" id="budget_amount_units" value="100" min="0" step="1" required title="Numeric value">
+        <span class="help" data-field="budget_amount_units">?</span>
+        <span class="tooltip"></span>
+      </label>
+    </div>
+    <div class="field">
+      <label>Alert threshold percent
+        <input type="number" id="budget_threshold_percent" value="50" min="0" max="100" required title="0-100">
+        <span class="help" data-field="budget_threshold_percent">?</span>
+        <span class="tooltip"></span>
+      </label>
+    </div>
     <button type="button" onclick="generate()">Generate JSON</button>
   </form>
+
   <h2>terraform.auto.tfvars.json</h2>
   <pre id="output"></pre>
+
+  <div id="chatbot">
+    <button id="chat-toggle">💬 Need help?</button>
+    <div id="chat-window">
+      <div id="chat-messages"></div>
+      <input type="text" id="chat-question" placeholder="Ask the Cloud Architect...">
+      <input type="text" id="api_key" placeholder="OpenAI API Key (optional)" style="width:100%;">
+      <button type="button" onclick="askGPT()" id="chat-send">Send</button>
+    </div>
+  </div>
+
   <script>
-    function generate() {
-      const keys = [
-        'credentials_file',
-        'project_id',
-        'region',
-        'backend_bucket',
-        'user_email',
-        'group_email',
-        'billing_account_id',
-        'budget_amount_currency_code',
-        'budget_amount_units',
-        'budget_threshold_percent'
-      ];
-      const data = {};
-      keys.forEach(k => {
-        data[k] = document.getElementById(k).value.trim();
+    const helpTexts = {
+      credentials_file: "Provide the path to a Google Cloud service account key file. Terraform uses this file to authenticate. See https://cloud.google.com/docs/authentication/getting-started for instructions on obtaining a key.",
+      project_id: "The unique ID of your project as shown in the Google Cloud console. It will be used for all resources created by Terraform.",
+      region: "Specify the GCP region for resources, e.g. us-central1. See https://cloud.google.com/about/locations for available regions.",
+      backend_bucket: "Name of an existing Google Cloud Storage bucket where Terraform state will be stored. Terraform must have permission to read and write in this bucket.",
+      user_email: "Individual email address that will receive billing budget notifications.",
+      group_email: "Group email address to receive billing budget notifications.",
+      billing_account_id: "Identifier of the billing account in the form XXXXXX-XXXXXX-XXXXXX. Find it in the Google Cloud console under Billing.",
+      budget_amount_currency_code: "Currency to use for the billing budget amount.",
+      budget_amount_units: "Numeric amount for the budget limit.",
+      budget_threshold_percent: "Percentage of the budget that triggers an alert."
+    };
+
+    document.querySelectorAll('.help').forEach(el => {
+      el.addEventListener('mouseover', () => {
+        const field = el.dataset.field;
+        el.nextElementSibling.textContent = helpTexts[field] || '';
       });
-      document.getElementById('output').textContent = JSON.stringify(data, null, 2);
-    }
+      el.addEventListener('mouseout', () => {
+        el.nextElementSibling.textContent = '';
+      });
+    });
+
+      function generate() {
+        const keys = Object.keys(helpTexts);
+        const data = {};
+        keys.forEach(k => {
+          data[k] = document.getElementById(k).value.trim();
+        });
+        document.getElementById('output').textContent = JSON.stringify(data, null, 2);
+      }
+
+      document.getElementById('chat-toggle').addEventListener('click', () => {
+        document.getElementById('chat-window').classList.toggle('open');
+      });
+
+      async function askGPT() {
+        const key = document.getElementById('api_key').value.trim();
+        const question = document.getElementById('chat-question').value.trim();
+        const chatBox = document.getElementById('chat-messages');
+        if (!question) return;
+        chatBox.textContent += 'You: ' + question + '\n';
+
+        if (!key) {
+          const norm = question.toLowerCase();
+          for (const [field, help] of Object.entries(helpTexts)) {
+            if (norm.includes(field.replace(/_/g, ' '))) {
+              chatBox.textContent += 'Bot: ' + help + '\n';
+              chatBox.scrollTop = chatBox.scrollHeight;
+              document.getElementById('chat-question').value = '';
+              return;
+            }
+          }
+          chatBox.textContent += 'Bot: Please provide an OpenAI API key for more detailed help.\n';
+          chatBox.scrollTop = chatBox.scrollHeight;
+          document.getElementById('chat-question').value = '';
+          return;
+        }
+
+        chatBox.textContent += 'Bot: ...\n';
+        chatBox.scrollTop = chatBox.scrollHeight;
+        try {
+          const response = await fetch('https://api.openai.com/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + key
+            },
+            body: JSON.stringify({
+              model: 'gpt-3.5-turbo',
+              messages: [
+                {role: 'system', content: 'You are a helpful assistant for filling out a Terraform configuration form.'},
+                {role: 'user', content: question}
+              ]
+            })
+          });
+          const data = await response.json();
+          chatBox.textContent = chatBox.textContent.replace('Bot: ...', 'Bot: ' + (data.choices && data.choices[0].message.content ? data.choices[0].message.content : 'No response'));
+        } catch (err) {
+          chatBox.textContent = chatBox.textContent.replace('Bot: ...', 'Bot: Error contacting API');
+        }
+        chatBox.scrollTop = chatBox.scrollHeight;
+        document.getElementById('chat-question').value = '';
+      }
   </script>
 </body>
 </html>
