@@ -9,6 +9,7 @@ This repository contains Terraform configuration for a small Google Cloud setup.
 - `variables.tf` – declares input variables such as project ID, region and billing configuration.
 - `main.tf` – configures the Google provider and creates a `google_billing_budget` resource.
 - `Código com versionamento e backend remoto` – an extended example with additional resources (VPC, instances and billing notifications).
+- `scripts/agent.py` – interactive helper that collects values for required variables and can create a GitHub Actions pipeline.
 
 ## Usage
 
@@ -25,5 +26,11 @@ This repository contains Terraform configuration for a small Google Cloud setup.
    ```sh
    terraform apply
    ```
+
+### Interactive setup
+
+Run `scripts/agent.py` to be guided through entering the required variables. The
+script can also generate a basic GitHub Actions workflow for running Terraform
+commands automatically.
 
 This structure follows the [Cloud Foundation Fabric](https://github.com/GoogleCloudPlatform/cloud-foundation-fabric) style by separating version constraints, backend configuration and variable definitions.
