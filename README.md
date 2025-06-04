@@ -43,6 +43,9 @@ The page features a minimalistic design and a floating **Cloud Architect** chat 
 Type a question to receive built‑in tips or provide your OpenAI API key for full
 ChatGPT responses.
 
+If you fork this repository, enable GitHub Pages from the repository settings and select the `docs/`
+folder as the source to serve the web form from your own URL.
+
 Save the generated JSON into a file named `terraform.auto.tfvars.json` in the
 repository root. Terraform will automatically load these variables on the next
 `terraform plan` or `terraform apply` run.
